@@ -1,14 +1,6 @@
 # API Testing
 
-> **Project Note (Flowser):** This project uses Hono (not Express) for the API layer, served via tRPC. Supertest does not work directly with Hono. Use Hono's built-in test helper instead:
-> ```typescript
-> import { testClient } from 'hono/testing';
-> import app from './app';
->
-> const res = await testClient(app).users.$post({ json: { email: 'test@example.com' } });
-> expect(res.status).toBe(201);
-> ```
-> Or use `fetch` against a running dev server. The Express/Supertest examples below are kept as generic reference for non-Flowser projects.
+> **Project Note:** If your project uses a framework other than Express (e.g., Hono, Fastify), Supertest may not work directly. Use the framework's built-in test helper or `fetch` against a running dev server instead. The Express/Supertest examples below are kept as generic reference.
 
 ## Supertest (Jest/Vitest)
 
