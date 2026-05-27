@@ -1,6 +1,172 @@
 # VibeCo Agent Harness Setup - Reference
 
-Detailed instructions for each phase of the vc-setup skill.
+Detailed instructions for each phase of the vc-setup skill, including interactive flows for new and existing projects.
+
+## Project Classification
+
+After running DETECT, classify the project before choosing a flow:
+
+| Signal | Classification |
+|--------|---------------|
+| No `process/` directory, no `all-context.md`, no meaningful CLAUDE.md content | **New project** -- use Flow A |
+| Has `process/` directory with any content | **Existing project** -- use Flow B |
+| Has `all-context.md` with real (non-placeholder) content | **Existing project** -- use Flow B |
+| Has CLAUDE.md with project-specific sections (beyond managed protocol) | **Existing project** -- use Flow B |
+| Has `.vibecode-backup/` (just ran install.sh over an existing setup) | **Existing project** -- use Flow B |
+
+When in doubt, treat as existing. It is always safer to study first and ask before changing things.
+
+---
+
+## Flow A: New Project
+
+For projects where the harness is being set up for the first time. The full sequence is:
+
+```
+DETECT -> present summary -> ASK user about project -> SCAFFOLD -> STUDY -> present summary -> VALIDATE
+```
+
+### Step 1: DETECT
+
+Run all detection checks (see DETECT Phase section below). Present findings to the user. Wait for confirmation.
+
+### Step 2: ASK — Discovery Conversation
+
+This is not a checklist — it is an open-ended conversation that continues until you thoroughly understand the project. The user's own words are the most valuable input for producing useful context files.
+
+**How the conversation works:**
+
+Start broad, then go deeper based on answers. Ask follow-ups on anything vague or interesting. Do not move on after a fixed number of questions — keep going until both you and the user are satisfied that nothing important is missing.
+
+**Round 1 — Project identity (always start here):**
+- "What is this project? Give me a brief description in your own words."
+- "Who uses it? Who is the target audience?"
+- Purpose: populates the project description in all-context.md. A human description is always better than what a code scan infers.
+
+**Round 2 — Architecture and scope (adapt based on Round 1):**
+- "What are the main product areas or features?"
+- "How is the codebase organized? Any key services, packages, or modules I should know about?"
+- "What are the most important or complex parts of the codebase?"
+- Purpose: guides feature folder creation, architecture sections, and STUDY focus areas.
+
+**Round 3 — Workflow and conventions (adapt based on what you've learned):**
+- "Do you work solo or with a team?"
+- "Any coding conventions, naming patterns, or architectural decisions that are important?"
+- "How do you handle testing? CI/CD? Deployments?"
+- "Any external services, APIs, or integrations that are central to the project?"
+- Purpose: populates Key Patterns and Conventions, testing context, and infrastructure sections.
+
+**Round 4+ — Follow-ups (as many rounds as needed):**
+- Follow up on anything vague: "You mentioned [X] — can you tell me more about how that works?"
+- Probe pain points: "Are there any pain points, tech debt, or things you want agents to be careful about?"
+- Catch-all: "Anything else that is important context for working on this codebase?"
+- Domain-specific: If the project involves a specialized domain (finance, healthcare, gaming, etc.), ask about domain concepts that agents need to understand.
+- Purpose: captures the nuances that make context files genuinely useful vs generic.
+
+**When to stop asking:** When you can confidently explain the project to another developer — what it does, how it's built, what matters, what to watch out for. Summarize your understanding back to the user and ask them to confirm: "Here's what I understand about your project: [summary]. Is this accurate? Anything I'm missing?"
+
+**How to use the answers:**
+
+- Store the user's answers in working memory. Do not write them to files yet.
+- During the STUDY phase, incorporate the answers into the relevant sections of all-context.md.
+- The user's description of the project should appear near the top of all-context.md, not buried in a scan output.
+- Feature areas the user mentions should be cross-referenced with the automated feature detection. If the user names a feature area that the scan does not detect, ask the user where the relevant code lives rather than silently skipping it.
+- Pain points and gotchas the user mentions should appear in a dedicated section so agents are warned.
+
+### Steps 3-5: SCAFFOLD, STUDY, VALIDATE
+
+Proceed with the standard phases documented below. All scaffolding uses Fresh mode (create everything from seeds). The STUDY phase should reference the user's answers when populating context files.
+
+---
+
+## Flow B: Existing Project
+
+For projects that already have process/, context files, or prior setup. The full sequence is:
+
+```
+DETECT -> STUDY EXISTING -> PRESENT & ASK -> (optionally ASK project questions) -> SCAFFOLD (approved changes only) -> STUDY (gap-fill) -> present summary -> VALIDATE
+```
+
+### Step 1: DETECT
+
+Run all detection checks (see DETECT Phase section below). Note what existing setup was found. Present findings to the user. Wait for confirmation.
+
+### Step 2: STUDY EXISTING
+
+Before proposing any changes, build a complete picture of what is already there. This step is read-only.
+
+**Read these files/directories:**
+
+- `process/context/all-context.md` -- assess quality: does it have real content or placeholders?
+- `process/context/tests/all-tests.md` -- assess quality: real test commands or template text?
+- All `process/context/*/all-*.md` -- list existing context groups
+- All `process/features/*/` -- list existing feature folders, read their `_GUIDE.md` files
+- All `process/general-plans/active/*.md` -- note active plans (do not touch these)
+- `process/development-protocols/` -- check if protocol docs exist and their version
+- Any `CLAUDE.md` content beyond the managed protocol (some users add project-specific sections)
+
+**Produce an internal assessment:**
+
+For each file/directory found, classify it as:
+- **Good**: has real, detailed, useful content. Keep as-is.
+- **Stale**: has content but it is outdated, incomplete, or has unfilled placeholders. Candidate for update.
+- **Placeholder**: seed template text with no real content. Candidate for replacement.
+- **Missing**: expected by the harness but does not exist. Candidate for creation.
+
+### Step 3: PRESENT and ASK
+
+Show the user your findings in this format:
+
+```
+Here is what I found in your existing setup:
+
+LOOKS GOOD (I recommend keeping these as-is):
+- process/context/all-context.md -- has detailed architecture and stack info
+- process/features/auth/ -- well-documented with 3 active plans
+- [etc.]
+
+COULD BE IMPROVED (I can update these):
+- process/context/tests/all-tests.md -- has placeholder text, no real test commands
+- process/features/billing/_GUIDE.md -- empty, no scope description
+- [etc., with brief reason for each]
+
+MISSING (I recommend adding these):
+- process/context/database/ -- you have Prisma with 15+ models but no database context group
+- process/features/api/ -- the API layer has 20+ routes, warrants its own feature folder
+- [etc., with evidence for each recommendation]
+
+LAYOUT CHANGES (reorganization I would suggest):
+- process/plans/ -> process/general-plans/active/ (old layout, 4 plan files to migrate)
+- [etc.]
+- [if none needed: "Your layout matches the harness standard. No reorganization needed."]
+```
+
+**Wait for the user to respond.** They may:
+- Approve everything: "looks good, go ahead"
+- Selectively approve: "update the stale ones but don't add the new feature folders"
+- Reject changes: "leave everything as-is, just validate"
+- Ask questions: "why do you think billing needs improvement?"
+
+Respect their choices. Only proceed with approved changes.
+
+**Then have the full discovery conversation from Flow A (Step 2: ASK),** regardless of how much existing context you found. Existing context files may be stale, incomplete, or written by someone else. The user's live answers are always more current and more valuable.
+
+Start with: "I've read your existing context. Let me verify my understanding and fill in the gaps." Then:
+- Summarize what you learned from existing files.
+- Ask: "Is this still accurate? What's changed since these docs were written?"
+- Work through the same Round 1-4 question areas from Flow A, skipping anything the existing context already covers well and the user confirms is current.
+- Follow up on anything unclear or contradictory between the existing docs and what you see in the code.
+- Keep asking until you thoroughly understand the project as it is today.
+
+The combination of existing context + fresh user input produces the best results. Neither alone is sufficient.
+
+### Steps 4-6: SCAFFOLD, STUDY, VALIDATE
+
+- **SCAFFOLD**: Apply only the changes the user approved. Use Merge or Refresh mode as appropriate. Show what will be changed before doing it.
+- **STUDY**: Deep-scan and populate/update files. For files the user said to keep, do not overwrite. For stale/placeholder files, replace with real content. For new files, populate from scratch. Always merge intelligently -- see Migration Intelligence section below.
+- **VALIDATE**: Standard validation, then present the final summary.
+
+---
 
 ## DETECT Phase
 
@@ -49,14 +215,18 @@ Check these signals:
 - `lerna.json` exists
 - `turbo.json` or `nx.json` exists
 
-### Existing Process Scan
+### Existing Setup Scan
 
 Check for:
 
 - `process/` directory (existing harness)
+- `process/context/all-context.md` (existing context -- read first few lines to check if real or placeholder)
+- `process/development-protocols/` (existing protocol docs)
+- `process/features/` (existing feature folders)
 - `docs/` directory (existing documentation)
 - `.github/` directory (CI/CD)
 - `README.md` content (project description)
+- `.vibecode-backup/` (indicates install.sh just ran over an existing setup)
 
 ### Detection Summary Format
 
@@ -64,6 +234,7 @@ Present to user:
 
 ```
 Project Detection Summary:
+- Project name: {from package.json name field}
 - Package manager: {detected_pm}
 - Framework: {framework} {version} ({details like "App Router", "Pages Router"})
 - Runtime: {node/bun/deno} {version from engines or .node-version}
@@ -72,12 +243,16 @@ Project Detection Summary:
 - Auth: {provider} (or "none detected")
 - Test runner: {runners with per-package breakdown}
 - Test commands: {commands}
-- Existing process/: {none/partial/full} ({details})
-- Project name: {from package.json name field}
-- Detected context groups: {list of groups to create}
-- Detected feature areas: {list of features to create}
+- Existing setup: {none / partial / full harness} ({details})
+- Setup flow: {Flow A (new project) / Flow B (existing project)}
 
-Proceed with scaffolding? (y/n)
+Detected context groups: {list of groups to create}
+Detected feature areas: {list of features to create}
+
+[For Flow A]: I'll ask you a few questions about your project before setting things up.
+[For Flow B]: I'll study your existing setup first, then show you what I found and recommend.
+
+Proceed? (y/n)
 ```
 
 ## SCAFFOLD Phase
@@ -208,15 +383,15 @@ Create everything from `process/_seeds/` (read-only source, never modified durin
 
 Preserve existing content, migrate old layouts, fill gaps (read from `process/_seeds/`, never modify seeds):
 
-**Step 0 — Layout Migration (before creating anything new):**
+**Step 0 -- Layout Migration (before creating anything new):**
 
-Detect old directory layouts and reorganize them into the harness standard structure. Print every move to the user.
+Detect old directory layouts and reorganize them into the harness standard structure. **Show every planned move to the user and wait for approval before executing.**
 
 | Old Layout | Migration Action |
 |------------|-----------------|
-| `process/plans/` exists, no `process/general-plans/` | Create `process/general-plans/active/` and `process/general-plans/completed/`. For each file in `process/plans/`: scan for "COMPLETE", "DONE", or "✅" markers — move matches to `completed/`, move the rest to `active/`. Remove empty `process/plans/`. |
-| `process/reports/` exists at top level | Move `process/reports/*` → `process/general-plans/reports/`. Remove empty `process/reports/`. |
-| `process/skills/` exists at top level | Move `process/skills/*` → `process/general-plans/references/`. Remove empty `process/skills/`. |
+| `process/plans/` exists, no `process/general-plans/` | Create `process/general-plans/active/` and `process/general-plans/completed/`. For each file in `process/plans/`: scan for "COMPLETE", "DONE", or checkmark markers -- move matches to `completed/`, move the rest to `active/`. Remove empty `process/plans/`. |
+| `process/reports/` exists at top level | Move `process/reports/*` to `process/general-plans/reports/`. Remove empty `process/reports/`. |
+| `process/skills/` exists at top level | Move `process/skills/*` to `process/general-plans/references/`. Remove empty `process/skills/`. |
 | `process/context/example-*.md` outside `planning/` | Move to `process/context/planning/`. |
 | process/context/backlog.md | Move to `process/general-plans/backlog/backlog.md` |
 
@@ -226,7 +401,7 @@ Detect old directory layouts and reorganize them into the harness standard struc
 - After all moves, remove empty source directories.
 - If a plan file contains phase patterns (`phase-00-`, `phase-01-`, etc.) and a master plan file exists alongside them, keep them grouped in the same destination directory.
 
-**Step 1–6 — Standard merge (after migration):**
+**Step 1-6 -- Standard merge (after migration):**
 
 1. Create only missing directories
 2. Add `_GUIDE.md` to empty directories that lack them (source: `process/_seeds/`)
@@ -259,6 +434,15 @@ All other content is populated by the STUDY phase using real codebase analysis, 
 
 The STUDY phase is the core value of vc-setup v3. It transforms scaffolded seed files into ready-to-use context by actively scanning the codebase.
 
+### Incorporating User Answers
+
+If the user answered project questions (from the ASK step in Flow A, or the PRESENT & ASK step in Flow B), incorporate their answers into context files:
+
+- **Project description**: The user's own words go into the top of all-context.md. This is more valuable than an auto-generated description.
+- **Product areas/features**: Cross-reference with automated feature detection. If the user named a feature the scan missed, ask where the code lives. If the scan found a feature the user did not mention, include it but note it was auto-detected.
+- **Conventions and workflows**: Add to the Key Patterns and Conventions section. Team knowledge that is invisible in code is exactly what makes context files useful.
+- **Team/branching info**: If provided, include in a Workflow or Conventions section.
+
 ### Parallel Subagent Delegation Strategy
 
 The STUDY phase is the most resource-intensive part of vc-setup. The executing agent SHOULD spawn parallel subagents to maximize throughput and avoid context window exhaustion.
@@ -286,10 +470,10 @@ Spawn up to 4 parallel subagents. Each writes to a distinct set of files with no
 
 | Subagent | Consumes | Writes to |
 |----------|----------|-----------|
-| E: all-context.md Writer | Findings from A + C | `process/context/all-context.md` |
+| E: all-context.md Writer | Findings from A + C + user answers | `process/context/all-context.md` |
 | F: all-tests.md Writer | Findings from B | `process/context/tests/all-tests.md` |
 | G: Context Group Scaffolder | Findings from C | `process/context/{group}/all-{group}.md` for each group |
-| H: Feature Folder Scaffolder | Findings from D | `process/features/{feature}/` dirs + `_GUIDE.md` files |
+| H: Feature Folder Scaffolder | Findings from D + user answers | `process/features/{feature}/` dirs + `_GUIDE.md` files |
 
 Wait for all Round 2 subagents to complete. Proceed to VALIDATE.
 
@@ -353,6 +537,8 @@ Scan these locations for feature identification:
 - README sections listing features
 - Existing `docs/` or wiki content
 
+**Cross-reference with user answers.** If the user named product areas in the ASK step, those are strong signals for feature folders even if the automated scan would not have created them. Ask the user where the code lives if you cannot find it.
+
 **Feature folder creation threshold:**
 - Create a feature folder only when the feature has 3+ source files AND is a distinct product area (not a utility)
 - For monorepos: each app or business-logic package is a candidate
@@ -367,16 +553,17 @@ Scan these locations for feature identification:
 After scanning (or receiving Round 1 findings), write real content into `all-context.md`. Replace the seed template sections with actual project data:
 
 1. **Title**: Replace `{{project_name}}` with the actual project name
-2. **Quick Start section**: Keep the generic routing instructions from the template
-3. **Current Root Entry Points table**: Populate with actual context files that were created
-4. **Current Context Groups table**: Populate with groups created by the context group detection step
-5. **Task Routing table**: Fill based on what context groups exist, mapping task types to the relevant entry points
-6. **Repository Structure**: Write actual directory tree output (2-3 levels deep, showing key directories and files)
-7. **Technology Stack**: Write specific framework names, versions, and combinations discovered during analysis
-8. **Key Patterns and Conventions**: Document actual patterns found in the codebase (error handling, state management, API patterns, naming conventions, import aliases)
-9. **Environment and Configuration**: List actual env var groups found (names only, never values)
-10. **Context Group Lifecycle**: Keep the generic instructions from the template
-11. **Scan Metadata** (add at bottom):
+2. **Project description**: Use the user's own words from the ASK step if available. Supplement with what the code scan reveals. The user's description should be prominent, not buried.
+3. **Quick Start section**: Keep the generic routing instructions from the template
+4. **Current Root Entry Points table**: Populate with actual context files that were created
+5. **Current Context Groups table**: Populate with groups created by the context group detection step
+6. **Task Routing table**: Fill based on what context groups exist, mapping task types to the relevant entry points
+7. **Repository Structure**: Write actual directory tree output (2-3 levels deep, showing key directories and files)
+8. **Technology Stack**: Write specific framework names, versions, and combinations discovered during analysis
+9. **Key Patterns and Conventions**: Document actual patterns found in the codebase (error handling, state management, API patterns, naming conventions, import aliases). Include conventions the user mentioned in the ASK step.
+10. **Environment and Configuration**: List actual env var groups found (names only, never values)
+11. **Context Group Lifecycle**: Keep the generic instructions from the template
+12. **Scan Metadata** (add at bottom):
     ```
     ## Scan Metadata
 
@@ -440,6 +627,7 @@ Verify the STUDY phase produced real content:
 4. **Test commands populated**: `all-tests.md` contains actual test commands (not `{{test_commands}}` or placeholder text)
 5. **Context group routing**: Every context group directory under `process/context/` has a corresponding entry in the "Current Context Groups" table in `all-context.md`
 6. **Feature folder guides**: Every feature folder under `process/features/` (excluding the root `_GUIDE.md`) has a `_GUIDE.md` file with a real scope description
+7. **User input incorporated**: If the user provided project description or conventions in the ASK step, verify they appear in the relevant sections of all-context.md
 
 ### Agent Parity Check
 
@@ -460,11 +648,25 @@ ls -la .agents/skills
 ls .agents/skills/vc-setup/SKILL.md
 ```
 
-### Post-Setup
+### Post-Setup Summary
 
-After validation passes, suggest these next steps to the user:
+Present a final summary to the user:
 
-1. Review `process/context/all-context.md` and refine any sections that need more detail
+```
+Setup complete!
+
+What was created/updated:
+- [list of directories created]
+- [list of files populated with real content]
+- [list of context groups created]
+- [list of feature folders created]
+
+What was preserved (existing project only):
+- [list of files/dirs that were kept as-is per user approval]
+
+Recommended next steps:
+1. Review process/context/all-context.md and refine any sections that need more detail
 2. Review detected context groups and feature folders -- add or remove as needed
-3. Run `audit-context` skill to validate context discovery wiring
+3. Run the vc-audit-context skill to validate context discovery wiring
 4. Start using the harness: describe a feature request to trigger the RIPER-5 workflow
+```

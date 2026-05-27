@@ -1,14 +1,74 @@
-# Flowser
+# vibecode-pro-max-kit
 
-Flowser monorepo -- Next.js web app + Docker containers for AI agent-powered browser automation.
+A complete agent development harness for Claude Code and Codex. Installs 12 specialized agents, 30+ skills, hooks, and a structured development workflow into any project.
 
-**Tech Stack**: Next.js 15 (App Router), tRPC, Prisma + PostgreSQL, Docker, OpenClaw, CloakBrowser, Tailwind CSS v4, shadcn/ui
+---
+
+## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/withkynam/vibecode-pro-max-kit/main/install.sh | bash
+```
+
+This backs up any existing `.claude/`, `.codex/`, `.agents/` setup, then installs the full harness. Your `process/` directory (plans, context, features) is preserved. Your `.claude/settings.json` is restored after install.
+
+After the script finishes, open Claude Code and run the setup skill to configure everything for your project.
+
+### One-prompt setup
+
+After installing, paste this into Claude Code to get everything configured:
+
+<details>
+<summary><strong>Copy this prompt</strong> (click to expand)</summary>
+
+```
+Run vc-setup to set up this project with the agent harness.
+
+Follow the full interactive flow:
+
+1. DETECT — Read package.json, detect my stack (framework, package manager, monorepo
+   structure, test framework, database, auth). Also check if I have any existing .claude/,
+   process/, or context files from a previous setup.
+
+2. SHOW ME WHAT YOU FOUND — Present a summary of the detection results and wait for me
+   to confirm before continuing. If this is an existing project with process/ folders or
+   context files, tell me what you found and what looks good vs what could be improved.
+
+3. ASK ME ABOUT THE PROJECT — Before scaffolding or scanning, have a real conversation
+   with me about this project. Don't just ask a fixed list of questions and move on — ask
+   follow-ups based on my answers, probe deeper on anything vague, and keep going until
+   you genuinely understand the project. Start with the basics (what is this? who uses it?),
+   then dig into architecture, features, conventions, pain points, and anything else that
+   matters. Summarize your understanding back to me and confirm it's correct before moving on.
+
+4. SCAFFOLD — Create the process/ directory structure. If I already have process/ folders,
+   show me what you plan to change and wait for my approval before reorganizing anything.
+   Never silently move or delete my existing files.
+
+5. STUDY — Deep-scan the codebase and populate process/context/all-context.md with REAL
+   content based on what you find AND what I told you. Include: repo structure, tech stack
+   with versions, key patterns and conventions, import aliases, env vars, API routes,
+   database schema, test setup. Do not leave placeholder text.
+
+6. VALIDATE — Run all the validation checks to make sure everything is wired correctly.
+
+Important rules:
+- If I have existing context files or a well-written CLAUDE.md, read them first and
+  preserve what is good. Merge intelligently — do not replace good content with generic scans.
+- Show me a summary of what you plan to create or change at each major step and wait
+  for my OK before proceeding.
+- Do not create empty placeholder files. Only create files that have real content.
+- Ask before reorganizing. If my existing setup works, tell me what you would improve
+  and let me decide.
+```
+
+</details>
 
 ---
 
 ## Development System
 
-This monorepo uses **RIPER-5** -- a spec-driven development protocol shared across Claude and Codex. Every request is routed through a skill-discovery step, then to the right agent or workflow.
+The harness uses **RIPER-5** -- a spec-driven development protocol shared across Claude and Codex. Every request is routed through a skill-discovery step, then to the right agent or workflow.
 
 ---
 
@@ -109,7 +169,7 @@ Skills are auto-discovered in Step 0. Use the current assistant/runtime entry su
 | `vc-audit-plans`       | Active-plan reconciliation and cleanup                                |
 | `vc-audit-vc`          | Agent harness, skill registry, README.md, and protocol wiring health  |
 | `vc-autoresearch`      | Autonomous metric optimization (coverage, bundle size) -- post-execute |
-| `vc-setup`             | Scaffold agent harness into a new project                             |
+| `vc-setup`             | Interactive harness setup -- detects, asks, scaffolds, studies, validates |
 | `vc-update`            | Pull latest harness from remote kit repo                              |
 | `vc-publish`           | Push harness improvements to remote kit repo                          |
 
