@@ -53,19 +53,19 @@ fi
 
 # Extract file list, merge list, copyIfMissing list, and symlinks from JSON
 FILES=$(echo "$MANIFEST_JSON" | node -e "
-  const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+  const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
   d.files.forEach(f => console.log(f));
 ")
 MERGE_FILES=$(echo "$MANIFEST_JSON" | node -e "
-  const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+  const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
   d.merge.forEach(f => console.log(f));
 ")
 COPY_IF_MISSING=$(echo "$MANIFEST_JSON" | node -e "
-  const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+  const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
   d.copyIfMissing.forEach(f => console.log(f));
 ")
 SYMLINKS_JSON=$(echo "$MANIFEST_JSON" | node -e "
-  const d = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+  const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
   for (const [k,v] of Object.entries(d.symlinks)) console.log(k + '|' + v);
 ")
 
