@@ -27,7 +27,7 @@
 <p align="center">
   <img src="https://media.tenor.com/q_5em_iLaxoAAAAC/tanjiro-i-water-style.gif" alt="Flow like water" width="480">
   <br><br>
-  <em>"Concentracao Total — Respiracao Spec, Decima Forma: Fluxo Constante.<br>Um ciclo de desenvolvimento continuo que fica mais forte a cada feature entregue.<br>O contexto acumula. O flow nunca quebra."</em><br>
+  <em>"Concentracao Total — Respiracao Spec, Decima Forma: O Vibe Flow nunca quebra."</em><br>
   <strong>— Tanjiro Kamado</strong>
 </p>
 
@@ -80,7 +80,10 @@
     <img alt="Tech Stack Row 3" src="https://skillicons.dev/icons?i=supabase,firebase,postgres,mongodb,redis,docker,kubernetes,aws,gcp,azure,vercel,cloudflare,tailwind,electron&perline=15" />
   </picture>
   <br>
-  <sub>React · Next.js · Vue · Nuxt · Svelte · Angular · React Native · Electron · Node.js · Express · Bun · Hono · Python · Django · FastAPI · Flask · Ruby · Rails · Go · Rust · Java · Spring Boot · Kotlin · Swift · PHP · Laravel · C# · .NET · Elixir · TypeScript · Prisma · Supabase · Firebase · PostgreSQL · MongoDB · Redis · GraphQL · Docker · Kubernetes · Terraform · AWS · GCP · Azure · Vercel · Cloudflare · Tailwind · shadcn/ui · e qualquer outra stack que seu projeto use</sub>
+  <p><em>Nao e apenas decorativo. Ao executar <code>vc-setup</code>, agentes paralelos escaneiam sua base de codigo,<br>
+  detectam sua stack e constroem grupos de contexto especificos do projeto que cada skill le antes de trabalhar.<br>
+  Outros harnesses fixam agentes em uma linguagem — <code>rust-review-agent</code>, <code>python-linter</code> — inuteis em qualquer outro lugar.<br>
+  Este se adapta a qualquer combinacao acima e acumula conhecimento conforme voce entrega.</em></p>
 </p>
 
 </div>
