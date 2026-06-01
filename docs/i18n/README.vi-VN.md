@@ -27,7 +27,7 @@
 <p align="center">
   <img src="https://media.tenor.com/q_5em_iLaxoAAAAC/tanjiro-i-water-style.gif" alt="Flow like water" width="480">
   <br><br>
-  <em>"Toàn Tập Trung — Hô Hấp Spec, Thập Chi Hình: Dòng Chảy Bất Tận.<br>Một chu trình phát triển liên tục, mạnh hơn với mỗi feature được ship.<br>Context tích lũy. Dòng chảy không bao giờ đứt."</em><br>
+  <em>"Toàn Tập Trung — Hô Hấp Spec, Thập Chi Hình: Vibe Flow không bao giờ đứt."</em><br>
   <strong>— Tanjiro Kamado</strong>
 </p>
 
@@ -80,7 +80,10 @@
     <img alt="Tech Stack Row 3" src="https://skillicons.dev/icons?i=supabase,firebase,postgres,mongodb,redis,docker,kubernetes,aws,gcp,azure,vercel,cloudflare,tailwind,electron&perline=15" />
   </picture>
   <br>
-  <sub>React · Next.js · Vue · Nuxt · Svelte · Angular · React Native · Electron · Node.js · Express · Bun · Hono · Python · Django · FastAPI · Flask · Ruby · Rails · Go · Rust · Java · Spring Boot · Kotlin · Swift · PHP · Laravel · C# · .NET · Elixir · TypeScript · Prisma · Supabase · Firebase · PostgreSQL · MongoDB · Redis · GraphQL · Docker · Kubernetes · Terraform · AWS · GCP · Azure · Vercel · Cloudflare · Tailwind · shadcn/ui · và bất kỳ stack nào project của bạn đang dùng</sub>
+  <p><em>Không chỉ để trang trí. Khi chạy <code>vc-setup</code>, các agent song song sẽ quét codebase của bạn,<br>
+  phát hiện stack, và xây dựng các context group dành riêng cho dự án mà mỗi skill đọc trước khi làm việc.<br>
+  Các harness khác hardcode agent vào một ngôn ngữ — <code>rust-review-agent</code>, <code>python-linter</code> — vô dụng ở nơi khác.<br>
+  Cái này thích nghi với mọi tổ hợp ở trên và tích lũy kiến thức khi bạn ship.</em></p>
 </p>
 
 </div>
